@@ -26,11 +26,13 @@ public class CalculatorController {
         LOGGER.info("REQUEST {}", requestArithmeticOperationsDTO);
 
         if (!requestArithmeticOperationsDTO.isValidOperator()) {
-            LOGGER.info("OPERATOR NOT FOUND: {}", requestArithmeticOperationsDTO.getOperator());
-            return new ResponseEntity<>(new GeneralResponseVO(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), 0.0), HttpStatus.BAD_REQUEST);
+            LOGGER.info("OPERATOR {} NOT FOUND", requestArithmeticOperationsDTO.getOperator());
+            return GeneralResponseVO.builder().status(HttpStatus.BAD_REQUEST.value()).message(HttpStatus.BAD_REQUEST.getReasonPhrase()).data(-1).build().badRequest();
         }
 
         ICalculator calculator = CalculatorFactory.getCalculator(requestArithmeticOperationsDTO.getOperatorEnum());
-        return new ResponseEntity<>(new GeneralResponseVO(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), calculator.calculate(requestArithmeticOperationsDTO.getFirstValue(), requestArithmeticOperationsDTO.getSecondValue())), HttpStatus.OK);
+        double result = calculator.calculate(requestArithmeticOperationsDTO.getFirstValue(), requestArithmeticOperationsDTO.getSecondValue());
+
+        return GeneralResponseVO.builder().status(HttpStatus.OK.value()).message(HttpStatus.OK.getReasonPhrase()).data(result).build().success();
     }
 }
